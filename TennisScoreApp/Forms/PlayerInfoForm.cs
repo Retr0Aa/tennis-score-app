@@ -25,11 +25,11 @@ namespace TennisScoreApp
         private void InitializeComponent()
         {
             this.Text = "Player Info - " + playerName;
-            this.Size = new Size(600, 450);
+            this.Size = new Size(620, 450);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
 
-            this.MinimumSize = new Size(600, 450);
-            this.MaximumSize = new Size(600, 450);
+            this.MinimumSize = new Size(620, 450);
+            this.MaximumSize = new Size(620, 450);
             this.MaximizeBox = false;
 
             Label labelTitle = new Label
@@ -42,7 +42,7 @@ namespace TennisScoreApp
 
             PictureBox pictureBoxFlag = new PictureBox
             {
-                Location = new Point(20, 10),
+                Location = new Point(20, 15),
                 Size = new Size(32, 20),
                 SizeMode = PictureBoxSizeMode.StretchImage
             };
@@ -60,7 +60,7 @@ namespace TennisScoreApp
             {
                 View = View.Details,
                 Location = new Point(20, 80),
-                Size = new Size(150, 300)
+                Size = new Size(170, 300)
             };
             listViewVictories.Columns.Add("Opponent", 100);
             listViewVictories.Columns.Add("Score", 50);
@@ -70,7 +70,7 @@ namespace TennisScoreApp
             {
                 View = View.Details,
                 Location = new Point(220, 80),
-                Size = new Size(150, 300)
+                Size = new Size(170, 300)
             };
             listViewLosses.Columns.Add("Opponent", 100);
             listViewLosses.Columns.Add("Score", 50);
@@ -80,7 +80,7 @@ namespace TennisScoreApp
             {
                 View = View.Details,
                 Location = new Point(420, 80),
-                Size = new Size(150, 300)
+                Size = new Size(170, 300)
             };
             listViewDraws.Columns.Add("Opponent", 100);
             listViewDraws.Columns.Add("Score", 50);

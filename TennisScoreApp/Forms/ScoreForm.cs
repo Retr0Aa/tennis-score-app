@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace TennisScoreApp
 {
+    public class DataModel
+    {
+        public Dictionary<string, Player> Players { get; set; }
+        public List<Game> Games { get; set; }
+    }
+
     public class ScoreForm : Form
     {
         private Label rankingLabel;
@@ -13,7 +21,11 @@ namespace TennisScoreApp
         private ListView listViewRanking;
         private ListView listViewLatestGames;
         private Button buttonAddNewGame;
+        private Button buttonSave;
+        private Button buttonLoad;
+        private Button buttonDeleteGame;
         private Label labelInfo;
+        private string currentFilePath = null;
 
         private static Dictionary<string, Player> players = new Dictionary<string, Player>();
         private List<Game> games = new List<Game>();
@@ -21,25 +33,24 @@ namespace TennisScoreApp
         public ScoreForm()
         {
             InitializeComponent();
+
+            buttonDeleteGame.Enabled = listViewLatestGames.SelectedItems.Count == 1;
         }
 
         public static Player GetPlayerByName(string name)
         {
-            if (players.ContainsKey(name))
-                return players[name];
-            return null;
+            return players.ContainsKey(name) ? players[name] : null;
         }
 
         private void InitializeComponent()
         {
             this.Text = "Tennis Score";
             this.Size = new Size(800, 600);
-
             this.MinimumSize = new Size(800, 600);
             this.MaximumSize = new Size(800, 600);
             this.MaximizeBox = false;
 
-            Label rankingLabel = new Label
+            rankingLabel = new Label
             {
                 Text = "Ranking",
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
@@ -47,7 +58,7 @@ namespace TennisScoreApp
                 AutoSize = true
             };
 
-            Label latestGamesLabel = new Label
+            latestGamesLabel = new Label
             {
                 Text = "Latest Games",
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
@@ -73,10 +84,11 @@ namespace TennisScoreApp
                 Location = new Point(350, 50),
                 Size = new Size(400, 400)
             };
-            listViewLatestGames.Columns.Add("First Player", 120);
-            listViewLatestGames.Columns.Add("Second Player", 120);
-            listViewLatestGames.Columns.Add("Winner", 120);
+            listViewLatestGames.Columns.Add("First Player", 100);
+            listViewLatestGames.Columns.Add("Second Player", 100);
+            listViewLatestGames.Columns.Add("Winner", 100);
             listViewLatestGames.Columns.Add("Score", 80);
+            listViewLatestGames.ItemSelectionChanged += ListViewLatestGames_ItemSelectionChanged;
 
             buttonAddNewGame = new Button
             {
@@ -84,6 +96,27 @@ namespace TennisScoreApp
                 Location = new Point(20, 470)
             };
             buttonAddNewGame.Click += ButtonAddNewGame_Click;
+
+            buttonSave = new Button
+            {
+                Text = "Save",
+                Location = new Point(150, 470)
+            };
+            buttonSave.Click += ButtonSave_Click;
+
+            buttonLoad = new Button
+            {
+                Text = "Load",
+                Location = new Point(250, 470)
+            };
+            buttonLoad.Click += ButtonLoad_Click;
+
+            buttonDeleteGame = new Button
+            {
+                Text = "Delete Game",
+                Location = new Point(350, 470)
+            };
+            buttonDeleteGame.Click += ButtonDeleteGame_Click;
 
             labelInfo = new Label
             {
@@ -97,7 +130,15 @@ namespace TennisScoreApp
             this.Controls.Add(listViewRanking);
             this.Controls.Add(listViewLatestGames);
             this.Controls.Add(buttonAddNewGame);
+            this.Controls.Add(buttonSave);
+            this.Controls.Add(buttonLoad);
+            this.Controls.Add(buttonDeleteGame);
             this.Controls.Add(labelInfo);
+        }
+
+        private void ListViewLatestGames_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            buttonDeleteGame.Enabled = listViewLatestGames.SelectedItems.Count == 1;
         }
 
         private void RefreshViews()
@@ -148,7 +189,6 @@ namespace TennisScoreApp
             {
                 if (newGameForm.ShowDialog() == DialogResult.OK)
                 {
-
                     Player firstPlayer = GetOrCreatePlayer(newGameForm.FirstPlayerName, newGameForm.FirstPlayerCountry);
                     Player secondPlayer = GetOrCreatePlayer(newGameForm.SecondPlayerName, newGameForm.SecondPlayerCountry);
 
@@ -196,8 +236,66 @@ namespace TennisScoreApp
 
         private List<Game> GetPlayerGames(string playerName)
         {
-            return games.Where(g => g.FirstPlayer.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)
-                                  || g.SecondPlayer.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)).ToList();
+            return games.Where(g =>
+                g.FirstPlayer.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase) ||
+                g.SecondPlayer.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        private void ButtonSave_Click(object sender, EventArgs e)
+        {
+            if (currentFilePath == null)
+            {
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Filter = "Tennis Game Files (*.tgame)|*.tgame";
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        currentFilePath = saveFileDialog.FileName;
+                    else
+                        return;
+                }
+            }
+            DataModel model = new DataModel { Players = players, Games = games };
+            string json = JsonSerializer.Serialize(model, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(currentFilePath, json);
+            MessageBox.Show("Data saved successfully.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ButtonLoad_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Tennis Game Files (*.tgame)|*.tgame";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    currentFilePath = openFileDialog.FileName;
+                    string json = File.ReadAllText(currentFilePath);
+                    DataModel model = JsonSerializer.Deserialize<DataModel>(json);
+                    players = model.Players ?? new Dictionary<string, Player>();
+                    games = model.Games ?? new List<Game>();
+                    RefreshViews();
+                    MessageBox.Show("Data loaded successfully.", "Load", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void ButtonDeleteGame_Click(object sender, EventArgs e)
+        {
+            if (listViewLatestGames.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Please select a game to delete.", "Delete Game", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("Are you sure you want to delete the selected game?",
+                "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                int selectedIndex = listViewLatestGames.SelectedIndices[0];
+                int gameIndex = games.Count - 1 - selectedIndex;
+                games.RemoveAt(gameIndex);
+                RefreshViews();
+                MessageBox.Show("Game deleted.", "Delete Game", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }

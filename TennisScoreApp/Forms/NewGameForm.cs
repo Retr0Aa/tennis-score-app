@@ -140,8 +140,9 @@ namespace TennisScoreApp
 
             buttonSave = new Button
             {
-                Text = "Save",
-                Location = new Point(100, 250)
+                Text = "Create Game",
+                Location = new Point(100, 250),
+                AutoSize = true
             };
             buttonSave.Click += ButtonSave_Click;
 

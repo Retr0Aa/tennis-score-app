@@ -7,6 +7,7 @@ This is a school project for managing tennis match scores using a simple interfa
 - Track and update tennis match scores
 - User-friendly interface
 - Simple and lightweight Windows Forms app
+- Saving & Loading data from file
 
 ## 🛠️ Installation
 
