@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TennisScoreApp.Properties;
 
 namespace TennisScoreApp
 {
@@ -27,6 +28,7 @@ namespace TennisScoreApp
             this.Text = "Player Info - " + playerName;
             this.Size = new Size(620, 450);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.Icon = Resources.tennis_icon;
 
             this.MinimumSize = new Size(620, 450);
             this.MaximumSize = new Size(620, 450);

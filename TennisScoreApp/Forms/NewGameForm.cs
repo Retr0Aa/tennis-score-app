@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using TennisScoreApp.Properties;
 
 namespace TennisScoreApp
 {
@@ -37,6 +38,7 @@ namespace TennisScoreApp
             this.Text = "New Game";
             this.Size = new Size(340, 320);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.Icon = Resources.tennis_icon;
 
             this.MinimumSize = new Size(340, 320);
             this.MaximumSize = new Size(340, 320);
@@ -149,14 +151,14 @@ namespace TennisScoreApp
             this.Controls.Add(labelTitle);
             this.Controls.Add(labelFirstPlayer);
             this.Controls.Add(textBoxFirstPlayer);
-            this.Controls.Add(labelSecondPlayer);
-            this.Controls.Add(textBoxSecondPlayer);
             this.Controls.Add(labelFirstPoints);
             this.Controls.Add(numericUpDownFirst);
-            this.Controls.Add(labelSecondPoints);
-            this.Controls.Add(numericUpDownSecond);
             this.Controls.Add(labelFirstCountry);
             this.Controls.Add(comboBoxFirstCountry);
+            this.Controls.Add(labelSecondPlayer);
+            this.Controls.Add(textBoxSecondPlayer);
+            this.Controls.Add(labelSecondPoints);
+            this.Controls.Add(numericUpDownSecond);
             this.Controls.Add(labelSecondCountry);
             this.Controls.Add(comboBoxSecondCountry);
             this.Controls.Add(buttonSave);
@@ -190,7 +192,7 @@ namespace TennisScoreApp
                 e.Graphics.DrawImage(country.Flag, e.Bounds.Left + 2, e.Bounds.Top + 2, 22 - 5, 16 - 5);
             }
 
-            e.Graphics.DrawString($"{country.Code}, {country.Name}", e.Font, SystemBrushes.ControlText, e.Bounds.Left + 20, e.Bounds.Top + 2);
+            e.Graphics.DrawString($"{country.Code}, {country.Name}", e.Font, SystemBrushes.ControlText, e.Bounds.Left + 20, e.Bounds.Top + 1);
             e.DrawFocusRectangle();
         }
 

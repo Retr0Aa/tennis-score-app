@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
+using TennisScoreApp.Properties;
 
 namespace TennisScoreApp
 {
@@ -46,6 +47,8 @@ namespace TennisScoreApp
         {
             this.Text = "Tennis Score";
             this.Size = new Size(800, 600);
+            this.Icon = Resources.tennis_icon;
+
             this.MinimumSize = new Size(800, 600);
             this.MaximumSize = new Size(800, 600);
             this.MaximizeBox = false;
